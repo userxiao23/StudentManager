@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springmvc.dao.ClazzDao">
+
+    <resultMap id="BaseResultMap" type="com.springmvc.entity.Clazz">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="gradeId" property="gradeId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="clazz_list">
+        id,gradeId,name,remark
+    </sql>
+
+    <select id="findClazzAll" resultMap="BaseResultMap">
+        select
+        <include refid="clazz_list"/>
+        from clazz
+    </select>
+
+    <select id="getTotal" resultType="Integer" parameterType="Map">
+        select count(id)
+        from clazz
+        <where>
+            <if test="name != null and name != ''">
+                name like concat('%',#{name},'%')
+            </if>
+            <if test="gradeId != null and gradeId != ''" >
+                gradeId = #{gradeId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getClazzList" resultMap="BaseResultMap" parameterType="Map">
+        select
+        <include refid="clazz_list"/>
+        from clazz
+        <where>
+            <if test="name != null and name != ''">
+                name like concat('%',#{name},'%')
+            </if>
+            <if test="gradeId != null and gradeId != ''">
+               and gradeId = #{gradeId}
+            </if>
+        </where>
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <update id="edit" parameterType="com.springmvc.entity.Clazz">
+        update clazz
+        set gradeId = #{gradeId},name = #{name}, remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <update id="deleteClazzById">
+        delete from clazz
+        where id in
+        <foreach collection="ids" open="(" close=");" item="id" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="addClazz" parameterType="com.springmvc.entity.Clazz">
+        insert into clazz(id, gradeId, name, remark)
+        value (null,#{gradeId},#{name},#{remark})
+    </update>
+</mapper>
